@@ -25,7 +25,7 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Item> getById(@PathVariable Long id) {
+    public ResponseEntity<Item> getById(@PathVariable("id") Long id) {
         return itemService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -38,13 +38,13 @@ public class ItemController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Item> upsert(@PathVariable Long id, @Valid @RequestBody Item item) {
+    public ResponseEntity<Item> upsert(@PathVariable("id") Long id, @Valid @RequestBody Item item) {
         boolean created = itemService.upsert(id, item);
         return ResponseEntity.status(created ? HttpStatus.CREATED : HttpStatus.OK).body(item);
     }
 
     @PostMapping("/{id}/done")
-    public ResponseEntity<Item> markDone(@PathVariable Long id) {
+    public ResponseEntity<Item> markDone(@PathVariable("id") Long id) {
         return itemService.findById(id)
                 .map(item -> {
                     item.setDone(true);
@@ -55,7 +55,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         if (itemService.delete(id)) {
             return ResponseEntity.noContent().build();
         }
