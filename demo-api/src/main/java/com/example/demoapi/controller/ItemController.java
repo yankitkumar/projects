@@ -44,6 +44,17 @@ public class ItemController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/{id}/done")
+    public ResponseEntity<Item> markDone(@PathVariable Long id) {
+        return itemService.findById(id)
+                .map(item -> {
+                    item.setDone(true);
+                    itemService.update(id, item);
+                    return ResponseEntity.ok(item);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (itemService.delete(id)) {

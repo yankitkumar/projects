@@ -72,6 +72,18 @@
       }
     },
     {
+      "name": "Mark item done",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/items/1/done",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "items", "1", "done"]
+        }
+      }
+    },
+    {
       "name": "Delete item",
       "request": {
         "method": "DELETE",
