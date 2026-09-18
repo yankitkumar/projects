@@ -38,10 +38,9 @@ public class ItemController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Item> update(@PathVariable Long id, @Valid @RequestBody Item item) {
-        return itemService.update(id, item)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<Item> upsert(@PathVariable Long id, @Valid @RequestBody Item item) {
+        boolean created = itemService.upsert(id, item);
+        return ResponseEntity.status(created ? HttpStatus.CREATED : HttpStatus.OK).body(item);
     }
 
     @PostMapping("/{id}/done")

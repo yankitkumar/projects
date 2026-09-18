@@ -23,7 +23,7 @@ The app starts on `http://localhost:8080` and seeds one item with id `1`.
 | GET    | `/api/items`         | -                                                 | List all items      |
 | GET    | `/api/items/{id}`    | -                                                 | Get one item        |
 | POST   | `/api/items`         | `{"name": "...", "description": "...", "done": false}` | Create an item |
-| PUT    | `/api/items/{id}`    | `{"name": "...", "description": "...", "done": true}`  | Update an item |
+| PUT    | `/api/items/{id}`    | `{"name": "...", "description": "...", "done": true}`  | Create at that id (`201`) if it doesn't exist, otherwise replace it (`200`) |
 | POST   | `/api/items/{id}/done` | -                                               | Mark an item done   |
 | DELETE | `/api/items/{id}`    | -                                                 | Delete an item      |
 
@@ -51,10 +51,15 @@ curl -X POST http://localhost:8080/api/items \
   -H "Content-Type: application/json" \
   -d '{"name":"Buy groceries","description":"Milk, eggs, bread","done":false}'
 
-# Update (use the id returned above)
+# Update an existing item
 curl -X PUT http://localhost:8080/api/items/1 \
   -H "Content-Type: application/json" \
   -d '{"name":"Buy groceries","description":"Milk, eggs, bread, butter","done":true}'
+
+# Create with a specific id (PUT to an id that doesn't exist yet -> 201)
+curl -X PUT http://localhost:8080/api/items/42 \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Custom id item","description":"created via PUT","done":false}'
 
 # Mark done
 curl -X POST http://localhost:8080/api/items/1/done

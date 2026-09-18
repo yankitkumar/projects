@@ -44,6 +44,15 @@ public class ItemService {
         return Optional.of(update);
     }
 
+    // Creates the item at id if absent, otherwise replaces it; returns true if it was newly created.
+    public boolean upsert(Long id, Item item) {
+        boolean isNew = !items.containsKey(id);
+        item.setId(id);
+        items.put(id, item);
+        idSequence.updateAndGet(current -> Math.max(current, id));
+        return isNew;
+    }
+
     public boolean delete(Long id) {
         return items.remove(id) != null;
     }
