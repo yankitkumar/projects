@@ -72,6 +72,36 @@
       }
     },
     {
+      "name": "Create with specific id (PUT)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Custom id item\",\n  \"description\": \"created via PUT\",\n  \"done\": false\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/items/42",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "items", "42"]
+        }
+      }
+    },
+    {
+      "name": "Mark item done",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/items/1/done",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "items", "1", "done"]
+        }
+      }
+    },
+    {
       "name": "Delete item",
       "request": {
         "method": "DELETE",
