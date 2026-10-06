@@ -1,0 +1,11 @@
+A neural network learns by adjusting its weights to reduce the error on its training data. A neural network can learn to recognise patterns that no programmer wrote down by hand. The training data teaches the network what a good answer looks like, and the network adjusts its weights until its answers look good too.
+
+A language model learns the patterns of text by reading a great deal of text. A language model predicts the next word from the words that came before it. The next word is chosen from the words that tend to follow the words before it, and the chain of choices builds a sentence, and the sentence builds a story.
+
+A search algorithm explores a map to find the shortest path from the start to the goal. A good search algorithm uses a heuristic to guess which path leads to the goal, and a good heuristic never guesses a distance that is longer than the truth. The search algorithm expands fewer nodes when the heuristic is good, and the goal is found sooner.
+
+A clustering algorithm groups points that are close to each other. A clustering algorithm does not need labels, because the structure of the data tells the algorithm which points belong together. The centre of each cluster moves towards the points that belong to it until the clusters stop changing.
+
+A spam filter counts how often each word appears in spam and in ordinary messages. A spam filter uses those counts to guess whether a new message looks more like spam or more like an ordinary message. The words free and prize appear in spam, and the words lunch and tomorrow appear in ordinary messages.
+
+A game playing program looks ahead at the moves that could follow its own move. A game playing program assumes that the opponent will choose the best reply, and it chooses the move that is best when the opponent replies well. The program never loses a simple game because it looks at every move that could follow.
