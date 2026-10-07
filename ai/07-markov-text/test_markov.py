@@ -27,6 +27,14 @@ class MarkovTests(unittest.TestCase):
         chain = MarkovChain(2).train(CORPUS)
         self.assertEqual(len(chain.generate(30, seed=0).split()), 30)
 
+    def test_length_shorter_than_order_is_respected(self):
+        for order in (2, 3):
+            chain = MarkovChain(order).train(CORPUS)
+            for length in range(order):
+                self.assertEqual(len(chain.generate(length, seed=0).split()), length)
+        self.assertEqual(chain.generate(1, start=("is", "chosen", "from")), "is")
+        self.assertEqual(chain.generate(-1, seed=0), "")
+
     def test_dead_end_stops_early(self):
         chain = MarkovChain(1).train("a b c")
         self.assertEqual(chain.generate(10, start=("a",)), "a b c")

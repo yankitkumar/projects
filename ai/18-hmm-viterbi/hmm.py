@@ -24,34 +24,45 @@ class HMM:
     """start[s] = P(first state), trans[s][t] = P(next state t | s), emit[s][o] = P(observe o | s)."""
 
     def __init__(self, start, trans, emit):
-        self.states = list(start)
+        # Every state named anywhere is in the model. Entries left out of a row mean probability 0.
+        named = [*start, *trans, *emit] + [t for row in trans.values() for t in row]
+        self.states = list(dict.fromkeys(named))
         self.start, self.trans, self.emit = start, trans, emit
+        self.symbols = {o for row in emit.values() for o in row}
+        for s in self.states:
+            if s not in trans or s not in emit:
+                raise ValueError("state %r needs a trans row and an emit row" % s)
         for name, row in [("start", start)] + [("trans[%s]" % s, trans[s]) for s in self.states] \
                 + [("emit[%s]" % s, emit[s]) for s in self.states]:
             if abs(sum(row.values()) - 1.0) > 1e-9:
                 raise ValueError("%s must sum to 1" % name)
 
-    def forward_log(self, obs):
-        """log P(obs), summing over every possible state sequence."""
+    def _check(self, obs):
         if not obs:
             raise ValueError("need at least one observation")
-        alpha = {s: log(self.start[s]) + log(self.emit[s][obs[0]]) for s in self.states}
+        for o in obs:
+            if o not in self.symbols:
+                raise KeyError(o)  # no state can emit it
+
+    def forward_log(self, obs):
+        """log P(obs), summing over every possible state sequence."""
+        self._check(obs)
+        alpha = {s: log(self.start.get(s, 0)) + log(self.emit[s].get(obs[0], 0)) for s in self.states}
         for o in obs[1:]:
-            alpha = {t: logsumexp([alpha[s] + log(self.trans[s][t]) for s in self.states])
-                        + log(self.emit[t][o]) for t in self.states}
+            alpha = {t: logsumexp([alpha[s] + log(self.trans[s].get(t, 0)) for s in self.states])
+                        + log(self.emit[t].get(o, 0)) for t in self.states}
         return logsumexp(list(alpha.values()))
 
     def viterbi(self, obs):
         """Return (most likely state sequence, its log probability)."""
-        if not obs:
-            raise ValueError("need at least one observation")
-        best = {s: log(self.start[s]) + log(self.emit[s][obs[0]]) for s in self.states}
+        self._check(obs)
+        best = {s: log(self.start.get(s, 0)) + log(self.emit[s].get(obs[0], 0)) for s in self.states}
         back = []
         for o in obs[1:]:
             nxt, pointer = {}, {}
             for t in self.states:
-                prev = max(self.states, key=lambda s: best[s] + log(self.trans[s][t]))
-                nxt[t] = best[prev] + log(self.trans[prev][t]) + log(self.emit[t][o])
+                prev = max(self.states, key=lambda s: best[s] + log(self.trans[s].get(t, 0)))
+                nxt[t] = best[prev] + log(self.trans[prev].get(t, 0)) + log(self.emit[t].get(o, 0))
                 pointer[t] = prev
             best = nxt
             back.append(pointer)

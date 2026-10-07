@@ -27,7 +27,7 @@ Both work in **log space**. Multiplying thousands of probabilities underflows to
 
 ## About the model
 
-An HMM is three tables: `start` (where it begins), `trans` (how states follow each other) and `emit` (what each state produces). The constructor checks that every row sums to 1. The same code handles other problems, such as part-of-speech tagging, speech recognition or decoding noisy sensors. Only the tables change.
+An HMM is three tables: `start` (where it begins), `trans` (how states follow each other) and `emit` (what each state produces). The constructor checks that every state has a `trans` row and an `emit` row, and that every row sums to 1. Entries left out of a row count as probability 0, so sparse tables need no explicit zeros. An observation that no state can emit raises `KeyError`. The same code handles other problems, such as part-of-speech tagging, speech recognition or decoding noisy sensors. Only the tables change.
 
 ## Tests
 

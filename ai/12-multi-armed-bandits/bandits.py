@@ -103,14 +103,14 @@ def run(agent, bandit, steps):
 
 def compare(factories, probs, steps=1000, runs=50):
     """Average final regret and best-arm pull rate for each strategy over many independent runs."""
-    best_arm = probs.index(max(probs))
+    best_arms = [i for i, p in enumerate(probs) if p == max(probs)]  # all arms tied for best
     results = {}
     for name, make in factories.items():
         total_regret = best_pulls = 0.0
         for r in range(runs):
             agent = make(len(probs), 1000 + r)
             total_regret += run(agent, BernoulliBandit(probs, seed=r), steps)[-1]
-            best_pulls += agent.counts[best_arm] / steps
+            best_pulls += sum(agent.counts[a] for a in best_arms) / steps
         results[name] = (total_regret / runs, best_pulls / runs)
     return results
 

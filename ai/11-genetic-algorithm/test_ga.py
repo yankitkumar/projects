@@ -9,9 +9,26 @@ class GATests(unittest.TestCase):
         self.assertEqual(best, "genetic algorithms evolve")
         self.assertEqual(history[-1], len("genetic algorithms evolve"))
 
+    def test_solves_targets_outside_lowercase_letters(self):
+        for target in ("Hello, World!", "café", "A"):
+            with self.subTest(target=target):
+                best, _ = solve_string(target, seed=0)
+                self.assertEqual(best, target)
+
     def test_elitism_makes_fitness_monotonic(self):
-        _, history = solve_string("hello world", seed=2, generations=40)
-        self.assertTrue(all(b >= a for a, b in zip(history, history[1:])))
+        # Heavy mutation and no early stop, so without elitism the best genome does get lost.
+        def drops(elite, seed):
+            _, history = evolve(
+                fitness=sum,
+                random_genome=lambda rng: [rng.randint(0, 1) for _ in range(20)],
+                crossover=lambda a, b, rng: a[:10] + b[10:],
+                mutate=lambda g, rng: [1 - x if rng.random() < 0.1 else x for x in g],
+                pop_size=20, generations=30, elite=elite, seed=seed,
+            )
+            return any(b < a for a, b in zip(history, history[1:]))
+
+        self.assertTrue(any(drops(0, seed) for seed in range(10)))
+        self.assertFalse(any(drops(2, seed) for seed in range(10)))
 
     def test_stops_early_at_target(self):
         _, history = solve_string("abc", seed=0, generations=500)
@@ -30,6 +47,12 @@ class GATests(unittest.TestCase):
         optimum = knapsack_optimum(ITEMS, CAPACITY)
         self.assertLessEqual(value, optimum)
         self.assertGreaterEqual(value, 0.95 * optimum)
+
+    def test_one_gene_genomes_can_be_crossed_over(self):
+        best, history = solve_string("a", seed=0, pop_size=10)
+        self.assertEqual(best, "a")
+        best, history, value = solve_knapsack(items=[(3, 5)], capacity=10)
+        self.assertEqual((best, value), ([1], 5))
 
     def test_knapsack_optimum_on_a_known_case(self):
         # Items are (weight, value). At capacity 5 the first two (value 7) tie with the third alone.

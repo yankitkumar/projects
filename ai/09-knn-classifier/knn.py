@@ -67,7 +67,8 @@ def cross_val_score(make_model, X, y, folds=5, seed=0):
 def best_k(X, y, ks=range(1, 16, 2), folds=5, seed=0):
     """Return (best k, {k: mean cross-validated accuracy}). Ties go to the smaller k."""
     results = {k: float(np.mean(cross_val_score(lambda: KNN(k), X, y, folds, seed))) for k in ks}
-    return max(results, key=results.get), results
+    top = max(results.values())  # equal means can differ in the last bit
+    return min(k for k, acc in results.items() if acc >= top - 1e-12), results
 
 
 def make_data(n_per=60, seed=0):

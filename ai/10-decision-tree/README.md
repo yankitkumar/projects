@@ -29,7 +29,7 @@ It recovers the rule used to generate the data. The thresholds land near 90 and 
 ## How it works
 
 - **Gini impurity** measures how mixed a node is: 0 when every sample has the same class.
-- At each node the tree tries every feature and every midpoint between neighbouring sorted values, and takes the split that lowers weighted impurity the most.
+- At each node the tree tries every feature and every midpoint between neighbouring sorted values, and takes the split that lowers weighted impurity the most. If two values are so close that their midpoint rounds up to the larger one, the smaller value is the threshold instead, so the split still separates them.
 - It stops at a pure node, at `max_depth`, below `min_samples_split` samples, or when no split strictly improves purity.
 - Feature importance is the total impurity reduction from each feature's splits, normalised to sum to 1.
 

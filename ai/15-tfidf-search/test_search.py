@@ -55,6 +55,14 @@ class SearchTests(unittest.TestCase):
     def test_tokenize_lowercases_and_drops_stopwords(self):
         self.assertEqual(tokenize("The Quick, Brown fox!"), ["quick", "brown", "fox"])
 
+    def test_accented_words_are_not_split_into_false_matches(self):
+        self.assertEqual(tokenize("Zürich café naïve résumé"), ["zürich", "café", "naïve", "résumé"])
+        self.assertEqual(tokenize("Zürich"), ["zürich"])  # decomposed accent, same word
+        self.assertEqual(self.engine.search("Zürich"), [])  # not "z" + "rich" matching "rich soil"
+        engine = SearchEngine([("Writing a résumé", "Keep your résumé to one page."),
+                               ("Adding numbers", "The sum of two even numbers is always even.")])
+        self.assertEqual([t for _, t, _ in engine.search("résumé", k=5)], ["Writing a résumé"])
+
 
 if __name__ == "__main__":
     unittest.main()

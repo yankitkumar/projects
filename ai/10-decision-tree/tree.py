@@ -18,7 +18,9 @@ class DecisionTree:
         X = np.asarray(X, dtype=float)
         y = np.asarray(y)
         self.classes_ = np.unique(y)
-        self.feature_names = feature_names or ["x%d" % j for j in range(X.shape[1])]
+        if feature_names is None:
+            feature_names = ["x%d" % j for j in range(X.shape[1])]
+        self.feature_names = list(feature_names)  # also accepts a numpy array or pandas Index
         self.importances_ = np.zeros(X.shape[1])
         self.root = self._build(X, np.searchsorted(self.classes_, y), depth=0)
         total = self.importances_.sum()
@@ -64,7 +66,10 @@ class DecisionTree:
                 weighted = ((i + 1) * gini(left) + (n - i - 1) * gini(right)) / n
                 gain = parent - weighted
                 if gain > best_gain:
-                    best_gain, best = gain, (j, (xs[i] + xs[i + 1]) / 2, gain)
+                    t = (xs[i] + xs[i + 1]) / 2
+                    if not xs[i] <= t < xs[i + 1]:
+                        t = xs[i]  # the midpoint of adjacent floats can round up to xs[i + 1]
+                    best_gain, best = gain, (j, t, gain)
         return best
 
     def _predict_one(self, x):

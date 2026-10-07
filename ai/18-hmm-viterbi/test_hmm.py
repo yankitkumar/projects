@@ -75,6 +75,35 @@ class HMMTests(unittest.TestCase):
         model = HMM(start={"A": 1.0}, trans={"A": {"A": 1.0}}, emit={"A": {"x": 1.0, "y": 0.0}})
         self.assertEqual(model.forward_log(["x", "y"]), float("-inf"))
 
+    def test_entries_left_out_of_the_tables_count_as_zero(self):
+        # A state missing from start is still a state: it can be reached by a transition.
+        model = HMM({"Rainy": 1.0}, WEATHER.trans, WEATHER.emit)
+        self.assertEqual(model.states, ["Rainy", "Sunny"])
+        self.assertEqual(model.viterbi(["clean", "walk", "walk"])[0], ["Rainy", "Sunny", "Sunny"])
+        total = sum(math.exp(model.forward_log(list(obs)))
+                    for obs in itertools.product(["walk", "shop", "clean"], repeat=2))
+        self.assertAlmostEqual(total, 1.0)
+
+        # Sparse tables, as in part-of-speech tagging, behave exactly like the dense ones.
+        dense = HMM(start={"DET": 1.0, "NOUN": 0.0},
+                    trans={"DET": {"DET": 0.0, "NOUN": 1.0}, "NOUN": {"DET": 0.5, "NOUN": 0.5}},
+                    emit={"DET": {"the": 1.0, "cat": 0.0, "dog": 0.0},
+                          "NOUN": {"the": 0.0, "cat": 0.5, "dog": 0.5}})
+        sparse = HMM(start={"DET": 1.0},
+                     trans={"DET": {"NOUN": 1.0}, "NOUN": {"DET": 0.5, "NOUN": 0.5}},
+                     emit={"DET": {"the": 1.0}, "NOUN": {"cat": 0.5, "dog": 0.5}})
+        for obs in (["the", "cat"], ["the", "dog", "dog", "the", "cat"], ["cat", "the"]):
+            self.assertEqual(sparse.viterbi(obs), dense.viterbi(obs))
+            self.assertEqual(sparse.forward_log(obs), dense.forward_log(obs))
+        with self.assertRaises(KeyError):
+            sparse.forward_log(["the", "dance"])   # no state emits it at all
+
+    def test_every_state_needs_a_trans_row_and_an_emit_row(self):
+        with self.assertRaises(ValueError):
+            HMM({"A": 1.0}, {"A": {"A": 0.5, "B": 0.5}}, {"A": {"x": 1.0}, "B": {"x": 1.0}})
+        with self.assertRaises(ValueError):
+            HMM({"A": 1.0}, {"A": {"A": 0.5, "B": 0.5}, "B": {"A": 1.0}}, {"A": {"x": 1.0}})
+
     def test_invalid_input_raises(self):
         with self.assertRaises(ValueError):
             WEATHER.viterbi([])

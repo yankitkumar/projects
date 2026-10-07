@@ -3,6 +3,7 @@
 import math
 import re
 import sys
+import unicodedata
 from collections import Counter
 
 from docs import DOCS
@@ -15,7 +16,9 @@ STOPWORDS = set(
 
 
 def tokenize(text):
-    return [w for w in re.findall(r"[a-z0-9]+", text.lower()) if w not in STOPWORDS]
+    # Unicode letters and digits (NFC joins decomposed accents first), so "café" stays one word.
+    text = unicodedata.normalize("NFC", text.lower())
+    return [w for w in re.findall(r"[^\W_]+", text) if w not in STOPWORDS]
 
 
 class SearchEngine:

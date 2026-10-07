@@ -33,7 +33,7 @@ class MarkovChain:
             if not choices:
                 break
             out.append(rng.choice(choices))
-        return " ".join(out)
+        return " ".join(out[:max(length, 0)])  # the starting words alone can exceed `length`
 
 
 if __name__ == "__main__":

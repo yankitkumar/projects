@@ -45,6 +45,14 @@ class BanditTests(unittest.TestCase):
         for name in ("ucb1", "thompson"):
             self.assertGreater(results[name][1], 0.8, name)
 
+    def test_every_arm_tied_for_best_counts_as_a_best_arm_pull(self):
+        for name, (regret, share) in compare(FACTORIES, [0.5, 0.5], steps=200, runs=5).items():
+            self.assertEqual(regret, 0.0, name)
+            self.assertAlmostEqual(share, 1.0, msg=name)
+        results = compare(FACTORIES, [0.5, 0.5, 0.1], steps=1000, runs=20)
+        for name in ("epsilon-greedy", "ucb1", "thompson"):
+            self.assertGreater(results[name][1], 0.9, name)
+
     def test_epsilon_one_explores_uniformly(self):
         agent = EpsilonGreedy(4, epsilon=1.0, seed=0)
         run(agent, BernoulliBandit([0.1, 0.2, 0.3, 0.9], seed=0), 4000)

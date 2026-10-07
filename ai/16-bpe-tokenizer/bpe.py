@@ -30,6 +30,8 @@ class BPETokenizer:
     def train(self, text, vocab_size):
         if vocab_size < 256:
             raise ValueError("vocab_size must be at least 256 (the byte alphabet)")
+        # Start over: new ids begin at 256 again, so old merges would clash with the new ones.
+        self.merges, self.vocab = {}, {i: bytes([i]) for i in range(256)}
         ids = list(text.encode("utf-8"))
         for new_id in range(256, vocab_size):
             counts = Counter(zip(ids, ids[1:]))

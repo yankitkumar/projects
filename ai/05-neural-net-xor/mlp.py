@@ -38,9 +38,8 @@ class MLP:
 
     def gradients(self, X, y):
         acts = self.forward(X)
-        n = len(acts[0])
         y = np.asarray(y, dtype=float).reshape(acts[-1].shape)
-        delta = (acts[-1] - y) / n  # d(loss)/d(z) for sigmoid + cross-entropy
+        delta = (acts[-1] - y) / y.size  # d(loss)/d(z): loss averages over every sample and output
         gW, gb = [None] * len(self.W), [None] * len(self.b)
         for i in reversed(range(len(self.W))):
             gW[i] = acts[i].T @ delta

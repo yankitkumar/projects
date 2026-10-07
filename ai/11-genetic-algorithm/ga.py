@@ -35,18 +35,21 @@ ALPHABET = string.ascii_lowercase + " "
 
 
 def solve_string(target, seed=0, pop_size=200, generations=500):
+    # Add any characters the target uses beyond ALPHABET, or it could never be reached.
+    alphabet = ALPHABET + "".join(sorted(set(target) - set(ALPHABET)))
+
     def fitness(genome):
         return sum(a == b for a, b in zip(genome, target))
 
     def random_genome(rng):
-        return "".join(rng.choice(ALPHABET) for _ in target)
+        return "".join(rng.choice(alphabet) for _ in target)
 
     def crossover(a, b, rng):
-        cut = rng.randrange(1, len(a))
+        cut = rng.randrange(1, len(a)) if len(a) > 1 else 0  # one gene: nowhere to cut
         return a[:cut] + b[cut:]
 
     def mutate(genome, rng):
-        return "".join(rng.choice(ALPHABET) if rng.random() < 1 / len(genome) else c for c in genome)
+        return "".join(rng.choice(alphabet) if rng.random() < 1 / len(genome) else c for c in genome)
 
     return evolve(fitness, random_genome, crossover, mutate, pop_size=pop_size,
                   generations=generations, target=len(target), seed=seed)
@@ -80,7 +83,7 @@ def solve_knapsack(items=ITEMS, capacity=CAPACITY, seed=0, pop_size=100, generat
         return [int(rng.random() < 0.2) for _ in items]
 
     def crossover(a, b, rng):
-        cut = rng.randrange(1, len(a))
+        cut = rng.randrange(1, len(a)) if len(a) > 1 else 0  # one gene: nowhere to cut
         return a[:cut] + b[cut:]
 
     def mutate(genome, rng):

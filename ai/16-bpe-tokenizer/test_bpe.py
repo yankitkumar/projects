@@ -30,6 +30,11 @@ class BPETests(unittest.TestCase):
     def test_vocab_size_is_an_upper_bound_and_exact_when_text_allows(self):
         self.assertLessEqual(len(self.tok.vocab), 300)
         self.assertEqual(len(self.tok.vocab), 256 + len(self.tok.merges))
+        # The premise: SAMPLE has repeated pairs for more than 300 tokens, so 300 is reached exactly.
+        self.assertGreater(len(BPETokenizer().train(SAMPLE, vocab_size=1000).vocab), 300)
+        self.assertEqual(len(self.tok.vocab), 300)
+        for size in (257, 280):
+            self.assertEqual(len(BPETokenizer().train(SAMPLE, vocab_size=size).vocab), size)
         big = BPETokenizer().train("abab" * 200, vocab_size=300)
         self.assertLess(len(big.vocab), 300)  # runs out of repeated pairs well before 300
 
@@ -45,6 +50,14 @@ class BPETests(unittest.TestCase):
     def test_a_frequent_word_becomes_one_token(self):
         self.assertEqual(len(self.tok.encode("the")), 1)
         self.assertLess(len(self.tok.encode("the cat")), len("the cat"))
+
+    def test_training_again_starts_from_scratch(self):
+        tok = BPETokenizer().train("hello hello hello", vocab_size=260).train("xyz xyz xyz", vocab_size=260)
+        fresh = BPETokenizer().train("xyz xyz xyz", vocab_size=260)
+        self.assertEqual(tok.merges, fresh.merges)
+        self.assertEqual(tok.vocab, fresh.vocab)
+        for text in ["help", "yellow", "the cat"]:
+            self.assertEqual(tok.decode(tok.encode(text)), text, text)
 
     def test_vocab_below_byte_alphabet_raises(self):
         with self.assertRaises(ValueError):

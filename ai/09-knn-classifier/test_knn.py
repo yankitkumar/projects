@@ -55,6 +55,15 @@ class KNNTests(unittest.TestCase):
         self.assertEqual(results[k], max(results.values()))
         self.assertGreater(KNN(k).fit(X_train, y_train).score(X_test, y_test), 0.6)
 
+    def test_best_k_tie_goes_to_smaller_k(self):
+        # k=3 and k=9 both get 52/60 right, but their fold means differ in the last bit
+        X, y = make_data(n_per=20, seed=27)
+        self.assertEqual(best_k(X, y, ks=[3, 9])[0], 3)
+        self.assertEqual(best_k(X, y, ks=[9, 3])[0], 3)
+        X = [[0], [1], [2], [3], [4], [10], [11], [12], [13], [14]]
+        y = [0] * 5 + [1] * 5
+        self.assertEqual(best_k(X, y, ks=[5, 3, 1])[0], 1)  # every k scores 1.0
+
     def test_standardising_rescues_a_badly_scaled_feature(self):
         rng = np.random.default_rng(0)
         n = 200

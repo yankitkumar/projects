@@ -23,7 +23,7 @@ It stops early once the best fitness reaches `target`.
 
 Two demos use it:
 
-- **String matching.** It evolves random letters into a target phrase, with fitness equal to the number of matching characters.
+- **String matching.** It evolves random characters into a target phrase, with fitness equal to the number of matching characters. Genes are drawn from lowercase letters and space, plus any other characters the target uses, so capitals, digits and punctuation can be matched too.
 - **0/1 knapsack.** It picks the most valuable items that fit in a weight limit. Overweight packs get a negative score that grows with the excess, so the search is pushed toward feasible packs instead of flat-lining at zero. A dynamic-programming solver gives the exact optimum to compare against.
 
 A genetic algorithm gives no guarantee of the optimum. Here the seeded run happens to hit it, and the test only requires within 5%.

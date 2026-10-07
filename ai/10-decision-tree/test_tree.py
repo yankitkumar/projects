@@ -22,6 +22,13 @@ class DecisionTreeTests(unittest.TestCase):
         self.assertEqual(tree.depth(), 1)
         self.assertAlmostEqual(tree.root["threshold"], 4.5)
 
+    def test_splits_values_one_ulp_apart(self):
+        # The float midpoint of 0.3 and 0.1 + 0.2 rounds up to the larger value.
+        X, y = [[0.3], [0.1 + 0.2]], ["low", "high"]
+        tree = DecisionTree().fit(X, y)
+        self.assertEqual(tree.depth(), 1)
+        self.assertEqual(tree.score(X, y), 1.0)
+
     def test_max_depth_is_respected(self):
         X, y = make_loans(seed=1)
         for depth in (1, 2, 4):
@@ -62,6 +69,12 @@ class DecisionTreeTests(unittest.TestCase):
         self.assertIn("income_k <=", text)
         self.assertIn("-> approve", text)
         self.assertTrue(set(tree.predict(X)) <= {"approve", "decline"})
+
+    def test_feature_names_can_be_a_numpy_array(self):
+        X, y = make_loans(seed=4)
+        tree = DecisionTree(max_depth=2).fit(X, y, np.array(FEATURES))
+        self.assertEqual(tree.feature_names, FEATURES)
+        self.assertIn("income_k <=", tree.export_text())
 
 
 if __name__ == "__main__":
