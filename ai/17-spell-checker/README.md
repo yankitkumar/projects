@@ -29,7 +29,7 @@ Fewer edits always beat higher frequency, because a closer word is more probable
 
 ## Limitations
 
-The vocabulary comes from `corpus.txt`, which is only 379 words (176 distinct), so the checker knows just those. A correctly spelled word outside it is "corrected" into a known word whenever one is within two edits: "tea" becomes "the" and "story" becomes "shore". Words with nothing nearby, like "guests" above, are left alone. It also looks at each word on its own, so it can't tell "their" from "there". Point `SpellChecker` at a much bigger text to fix the first problem.
+The vocabulary comes from `corpus.txt`, which is only 379 words (176 distinct), so the checker knows just those. A correctly spelled word outside it is "corrected" into a known word whenever one is within two edits: "tea" becomes "the" and "story" becomes "shore". Words with nothing nearby, like "guests" above, are left alone, and so are words with a letter outside a-z, like "café" or "naïve", because edits only use a-z. It also looks at each word on its own, so it can't tell "their" from "there". Point `SpellChecker` at a much bigger text to fix the first problem.
 
 ## Tests
 

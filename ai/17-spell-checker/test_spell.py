@@ -54,6 +54,10 @@ class SpellCheckerTests(unittest.TestCase):
     def test_words_with_no_candidate_are_returned_unchanged(self):
         self.assertEqual(self.checker.correct("zzzzzzzz"), "zzzzzzzz")
 
+    def test_input_with_no_letters_is_returned_unchanged(self):
+        for word in ["", "'", "''"]:
+            self.assertEqual(self.checker.correct(word), word, repr(word))
+
     def test_capitalisation_is_preserved(self):
         self.assertEqual(self.checker.correct("Teh"), "The")
         self.assertEqual(self.checker.correct("TEH"), "THE")
@@ -62,6 +66,23 @@ class SpellCheckerTests(unittest.TestCase):
     def test_correct_text_keeps_punctuation_and_spacing(self):
         self.assertEqual(self.checker.correct_text("Teh wether, was beutiful!"),
                          "The weather, was beautiful!")
+
+    def test_quotes_are_punctuation_but_inner_apostrophes_are_not(self):
+        for text, expected in [
+            ("the 'weather' was fine", "the 'weather' was fine"),
+            ("we stayed in the car ' until it stopped", "we stayed in the car ' until it stopped"),
+            ("'Teh car was ready", "'The car was ready"),
+        ]:
+            self.assertEqual(self.checker.correct_text(text), expected, text)
+        self.assertEqual(SpellChecker("don't stop").correct_text("Don't stpo"), "Don't stop")
+        self.assertEqual(set(SpellChecker("'quoted' don't").freq), {"quoted", "don't"})
+
+    def test_words_with_letters_beyond_a_to_z_are_kept_whole_and_left_alone(self):
+        self.assertEqual(self.checker.correct_text("a café and a naïve plan"),
+                         "a café and a naïve plan")
+        self.assertEqual(self.checker.correct_text("Teh café"), "The café")
+        self.assertEqual(self.checker.correct("café"), "café")     # edits1 only knows a-z
+        self.assertEqual(set(SpellChecker("un café").freq), {"un", "café"})
 
     def test_more_frequent_word_wins_among_equals(self):
         checker = SpellChecker("cat cat cat cut")

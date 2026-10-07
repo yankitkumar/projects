@@ -10,10 +10,11 @@ from collections import Counter
 from pathlib import Path
 
 LETTERS = "abcdefghijklmnopqrstuvwxyz"
+WORD = re.compile(r"[^\W\d_]+(?:'[^\W\d_]+)*")  # letters (not just a-z), ' only inside (don't)
 
 
 def words(text):
-    return re.findall(r"[a-z']+", text.lower())
+    return WORD.findall(text.lower())
 
 
 def edit_distance(a, b):
@@ -61,6 +62,8 @@ class SpellChecker:
 
     def correct(self, word):
         lower = word.lower()
+        if not lower.isascii() or not any(c.isalpha() for c in lower):
+            return word  # edits1 only knows a-z, so leave "café"; and "" or "'" has nothing to fix
         best = min(self.candidates(lower), key=lambda w: (-self.freq[w], w))  # most common, then A-Z
         if word.isupper() and len(word) > 1:
             return best.upper()
@@ -68,7 +71,7 @@ class SpellChecker:
 
     def correct_text(self, text):
         """Correct every word in `text`, leaving punctuation and spacing alone."""
-        return re.sub(r"[A-Za-z']+", lambda m: self.correct(m.group()), text)
+        return WORD.sub(lambda m: self.correct(m.group()), text)
 
 
 def default_checker():
