@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from kmeans import KMeans, make_blobs
+from kmeans import KMeans, ascii_plot, make_blobs
 
 CENTERS = [(0, 0), (8, 0), (4, 7)]
 
@@ -53,6 +53,15 @@ class KMeansTests(unittest.TestCase):
         X = np.zeros((10, 2))
         model = KMeans(k=3, seed=0).fit(X)
         self.assertAlmostEqual(model.inertia_, 0.0)
+
+    def test_ascii_plot_keeps_centroids_outside_the_points_on_the_grid(self):
+        # Happens when plotting new points with model.predict labels and the fitted centroids.
+        X = np.array([[1.0, 1.0], [5.0, 3.0], [3.0, 4.0]])
+        centroids = np.array([[-1.0, 0.0], [7.0, 5.0]])
+        lines = ascii_plot(X, [0, 1, 2], centroids, width=20, height=6).split("\n")
+        self.assertEqual([len(line) for line in lines], [20] * 6)
+        self.assertEqual(lines[-1][0], "#")  # bottom-left, not wrapped to the right edge
+        self.assertEqual(lines[0][-1], "#")  # top-right
 
 
 if __name__ == "__main__":

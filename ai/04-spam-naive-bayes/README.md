@@ -8,8 +8,8 @@ python spam.py "You won a free prize, click to claim" "Can you send me the notes
 
 ```
 held-out accuracy: 13/14 = 93%
-most spammy words: free, now, claim, click, win, link, no, verify
-most hammy words : i, can, me, when, thanks, i'll, come, at
+most spammy words: free, now, claim, click, win, link, account, cash
+most hammy words : i, can, me, when, at, come, i'll, meeting
 
 'You won a free prize, click to claim'
   -> spam (spam probability 100.0%)

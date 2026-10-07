@@ -9,7 +9,9 @@ from data import HAM, SPAM
 
 
 def tokenize(text):
-    return re.findall(r"[a-z0-9$']+", text.lower())
+    # Keep apostrophes only inside words ("i'll"), so quote marks around 'free' are dropped.
+    text = text.lower().replace("’", "'")  # typographic apostrophe -> ASCII
+    return re.findall(r"[a-z0-9$]+(?:'[a-z0-9$]+)*", text)
 
 
 class NaiveBayes:
@@ -62,7 +64,8 @@ class NaiveBayes:
             return math.log((mine[w] + self.alpha) / my_total) - math.log(
                 (sum(c[w] for c in others) + self.alpha) / other_total)
 
-        return sorted(self.vocab, key=odds, reverse=True)[:n]
+        # Break ties alphabetically; set order changes with the hash seed from run to run.
+        return sorted(self.vocab, key=lambda w: (-odds(w), w))[:n]
 
 
 def split(data, every=4):

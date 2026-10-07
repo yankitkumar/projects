@@ -17,8 +17,11 @@ class LinearRegression:
         X = np.asarray(X, dtype=float)
         y = np.asarray(y, dtype=float)
         mu, sigma = X.mean(axis=0), X.std(axis=0)
-        sigma[sigma == 0] = 1.0
+        # Find constant columns by range: their float std can be ~1e-17 instead of exactly 0.
+        const = np.ptp(X, axis=0) == 0
+        sigma[const] = 1.0
         Xs = (X - mu) / sigma
+        Xs[:, const] = 0.0
 
         n, d = Xs.shape
         w, b = np.zeros(d), 0.0

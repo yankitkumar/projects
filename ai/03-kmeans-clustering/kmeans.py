@@ -70,7 +70,9 @@ def make_blobs(centers, n_per=60, spread=0.6, seed=0):
 
 def ascii_plot(X, labels, centroids, width=64, height=22):
     """Draw points as their cluster digit (0-9) and centroids as '#'."""
-    lo, hi = X.min(axis=0), X.max(axis=0)
+    # Scale to the centroids too: they can lie outside the points (e.g. when plotting new data).
+    allp = np.vstack([X, centroids])
+    lo, hi = allp.min(axis=0), allp.max(axis=0)
     span = np.where(hi - lo == 0, 1, hi - lo)
 
     def cell(p):

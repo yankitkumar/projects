@@ -37,6 +37,15 @@ class LinearRegressionTests(unittest.TestCase):
         model = LinearRegression(epochs=2000).fit(X, y)
         self.assertGreater(model.score(X, y), 0.999)
 
+    def test_constant_feature_with_inexact_float_mean(self):
+        # The float std of a column of 0.1s is ~1e-17, not exactly 0.
+        for value in (0.1, 0.3, 1.1, 7.7):
+            X = np.column_stack([np.arange(10.0), np.full(10, value)])
+            y = 2 * X[:, 0] + 1
+            model = LinearRegression(epochs=2000).fit(X, y)
+            self.assertGreater(model.score(X, y), 0.999)
+            self.assertAlmostEqual(model.predict([[3.0, value]])[0], 7.0, places=4)
+
     def test_r2_is_zero_for_mean_predictor(self):
         X = np.arange(10.0).reshape(-1, 1)
         y = np.array([1.0, -1.0] * 5)
