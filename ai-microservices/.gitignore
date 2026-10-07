@@ -1,5 +1,16 @@
+# Maven build output
 target/
-*.log
+
+# IDE files
 .idea/
 *.iml
+*.iws
 .vscode/
+.classpath
+.project
+.settings/
+.factorypath
+
+# Logs and OS files
+*.log
+.DS_Store

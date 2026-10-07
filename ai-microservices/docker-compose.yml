@@ -1,0 +1,19 @@
+# Build the jars first (`mvn package` from this directory), then: docker compose up --build
+services:
+  ai-service:
+    build: ./ai-service
+    ports:
+      - "8082:8082"
+    environment:
+      # Leave unset to use the rule-based analyzer; export it in your shell to use Claude.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+
+  ticket-service:
+    build: ./ticket-service
+    ports:
+      - "8081:8081"
+    environment:
+      AI_SERVICE_URL: http://ai-service:8082
+    # Start order only: ticket-service still works (tickets marked UNAVAILABLE) while ai-service is down.
+    depends_on:
+      - ai-service

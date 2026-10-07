@@ -1,0 +1,227 @@
+{
+  "info": {
+    "name": "AI Microservices",
+    "_postman_id": "a28b487a-3141-4b18-a5af-069ee3ddb51c",
+    "description": "ticket-service (baseUrl) stores support tickets and enriches each one with an analysis from ai-service (aiUrl).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "aiUrl",
+      "value": "http://localhost:8082"
+    }
+  ],
+  "item": [
+    {
+      "name": "ticket-service",
+      "item": [
+        {
+          "name": "Create ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Production down: checkout fails for all users\",\n  \"body\": \"Since 09:10 UTC every checkout request fails with a 500 error. This is an outage affecting all users, please help immediately.\",\n  \"customerEmail\": \"ops@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tickets"]
+            }
+          }
+        },
+        {
+          "name": "Create ticket (validation error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"\",\n  \"body\": \"\",\n  \"customerEmail\": \"not-an-email\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tickets"]
+            }
+          }
+        },
+        {
+          "name": "Get all tickets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tickets"]
+            }
+          }
+        },
+        {
+          "name": "Get tickets (filtered)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets?category=BILLING",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tickets"],
+              "query": [
+                { "key": "category", "value": "BILLING" },
+                { "key": "priority", "value": "HIGH", "disabled": true },
+                { "key": "status", "value": "OPEN", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get ticket stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tickets", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get ticket by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tickets", "1"]
+            }
+          }
+        },
+        {
+          "name": "Re-analyze ticket",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/1/analyze",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tickets", "1", "analyze"]
+            }
+          }
+        },
+        {
+          "name": "Resolve ticket",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/1/resolve",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tickets", "1", "resolve"]
+            }
+          }
+        },
+        {
+          "name": "Delete ticket",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tickets", "1"]
+            }
+          }
+        },
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ai-service",
+      "item": [
+        {
+          "name": "Analyze ticket text",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Charged twice for my subscription\",\n  \"body\": \"I was charged twice for my October subscription invoice and I am really frustrated. Please refund the duplicate payment.\"\n}"
+            },
+            "url": {
+              "raw": "{{aiUrl}}/api/ai/analyze",
+              "host": ["{{aiUrl}}"],
+              "path": ["api", "ai", "analyze"]
+            }
+          }
+        },
+        {
+          "name": "Analyze ticket text (validation error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"\",\n  \"body\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{aiUrl}}/api/ai/analyze",
+              "host": ["{{aiUrl}}"],
+              "path": ["api", "ai", "analyze"]
+            }
+          }
+        },
+        {
+          "name": "Engine info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{aiUrl}}/api/ai/info",
+              "host": ["{{aiUrl}}"],
+              "path": ["api", "ai", "info"]
+            }
+          }
+        },
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{aiUrl}}/actuator/health",
+              "host": ["{{aiUrl}}"],
+              "path": ["actuator", "health"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
